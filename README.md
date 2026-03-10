@@ -1,6 +1,6 @@
-# 👗 Online Dress Rental System
+# 👗 CHICBORROW — Online Dress Rental System
 
-A full-stack web application for managing dress rentals, built with the **PERN Stack** (PostgreSQL, Express.js, React.js, Node.js). The system is split into two parts — a **Customer App** for browsing and renting dresses, and an **Admin Panel** for managing the full rental lifecycle.
+A full-stack web application for managing dress rentals, built with the **PERN Stack** (PostgreSQL, Express.js, React.js, Node.js). The system is split into two parts — a **Customer App** for browsing and renting dresses, and an **Admin Panel** for managing rentals and products.
 
 ---
 
@@ -11,9 +11,9 @@ A full-stack web application for managing dress rentals, built with the **PERN S
 | Frontend | React.js, Bootstrap 5 |
 | Backend | Node.js, Express.js |
 | Database | PostgreSQL, Prisma ORM |
-| Auth | JWT, RBAC (Role-Based Access Control) |
-| Libraries | Axios, SweetAlert2, Day.js |
-| Deployment | Ubuntu Linux, PM2 |
+| Auth | JWT |
+| Libraries | Axios, SweetAlert2 |
+| Deployment | Ubuntu Linux |
 
 ---
 
@@ -25,83 +25,36 @@ A full-stack web application for managing dress rentals, built with the **PERN S
 |------|-------------|
 | **Home** | Browse product catalog with sorting (latest / price low→high / price high→low) and pagination (15 items/page). Products with status `reserved` or `delete` are shown separately with status badges. |
 | **Product Detail** | View full product info with image gallery (main image + thumbnails), price, and description. Add to cart or wishlist. Status badges for unavailable items. |
-| **Cart** | Checkout flow — select rental duration (from configurable options), pick-up or delivery, view return date (auto-calculated), see rental summary (price, discount, deposit, shipping fee), and submit payment transfer info. |
-| **Orders** | View all rental orders with expandable item list, order status, return date, return status. Upload payment slip and return photo directly from the page. |
-| **Wishlist (Heart)** | View saved wishlist items. Remove items or add directly to cart. |
+| **Cart** | Checkout flow — select rental duration, pick-up or delivery, view return date (auto-calculated), see rental summary (price, discount, deposit, shipping fee), and submit payment transfer info. |
+| **Orders** | View all rental orders with item list, order status, return date, return status. Upload payment slip and return photo directly from the page. |
+| **Wishlist (Heart)** | View saved wishlist items. Remove items or add directly to cart. Stored in localStorage. |
 | **Profile** | Edit personal info (name, phone, address), change password, and manage bank account details for deposit refund. |
 | **Sign In** | Login with email + password. JWT token stored in localStorage. |
 | **Sign Up** | Register with validation — email format, password min 8 chars with letters+numbers, phone exactly 10 digits. |
-| **Contact** | Social media contact page (Instagram). |
+| **Contact** | Social media contact page (Instagram: @chicborrow). |
 
 ### 🛠️ Admin Panel
 
-- **Dashboard** — System overview: active rentals, revenue, low-stock alerts
-- **Product Management** — CRUD products, variants (size/color), images, stock
-- **Rental Management** — Full lifecycle management with status tracking
-- **Payment Verification** — Review and approve/reject uploaded payment slips
-- **Deposit Management** — Track security deposits (hold, refund, deduct)
-- **Returns & Penalties** — Record returns, add penalties (late/damage/lost), generate invoices
-- **Reports** — Monthly revenue chart, top-10 rented products, overdue rentals
-- **Stock Reservation** — Conflict-checking to prevent double-booking
-- **User Management** — Manage accounts, reset passwords, ban/unban users
-- **Audit Logs** — Track all admin actions with date-range cleanup
+| Page | Description |
+|------|-------------|
+| **Dashboard** | ระบบ overview (อยู่ระหว่างพัฒนา) |
+| **Product** | CRUD สินค้า พร้อมอัปโหลดรูปภาพและนำเข้า Excel |
+| **Category** | จัดการหมวดหมู่สินค้า พร้อมนำเข้า Excel และกรองสถานะ |
+| **BillSale** | จัดการรายการสั่งเช่า / ออเดอร์ |
+| **Customer** | จัดการข้อมูลลูกค้า (CRUD) |
+| **User** | จัดการบัญชีแอดมิน เฉพาะ owner เท่านั้น |
+| **Account** | จัดการบัญชีธนาคารร้าน เฉพาะ owner เท่านั้น |
+| **RentalDays** | กำหนดตัวเลือกวันเช่า ส่วนลด และค่าจัดส่ง |
 
----
+**Role ของ Admin:**
+- `owner` — เข้าถึงได้ทุกหน้า รวมถึง User และ Account
+- `use` — แอดมินทั่วไป
 
-## 🔄 Rental Workflow
-
-```
-PENDING → CONFIRMED → ACTIVE → RETURNED → COMPLETED
-                                    ↑
-                               LATE (auto)
-PENDING/CONFIRMED → CANCELLED (stock released)
-```
-
-| Status | Description |
-|--------|-------------|
-| `PENDING` | Rental created, awaiting confirmation |
-| `CONFIRMED` | Admin confirmed the booking |
-| `ACTIVE` | Item picked up, currently rented |
-| `LATE` | Past return date, auto-flagged |
-| `RETURNED` | Item returned, pending final check |
-| `COMPLETED` | Fully closed, stock released |
-| `CANCELLED` | Cancelled by admin, stock released |
-
----
-
-## 💳 Payment System
-
-**Payment Types:**
-- `RENTAL` — Rental fee
-- `DEPOSIT` — Security deposit
-- `PENALTY` — Late / damage / lost fee
-
-**Payment Status:**
-```
-PENDING (slip uploaded) → APPROVED ✓
-                        → REJECTED ✗
-```
-
-**Deposit Status:**
-```
-HELD → REFUNDED  (item returned in good condition)
-     → DEDUCTED  (damage or loss deducted)
-```
-
-**Return Status (Customer-facing):**
-
-| Status | Meaning |
-|--------|---------|
-| `pending` | Awaiting action |
-| `Waitingtocheck` | Return photo uploaded, pending admin review |
-| `approved` | Return accepted |
-| `rejected` | Item damaged — deposit forfeited |
-| `overdue` | Return overdue — deposit partially deducted |
 ---
 
 ## 🔌 API Endpoints
 
-### Customer App
+### Customer App (port 3001)
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -121,27 +74,89 @@ HELD → REFUNDED  (item returned in good condition)
 | `POST` | `/api/sale/uploadReturnImg/:id` | Upload return photo |
 | `PATCH` | `/api/sale/updateReturnStatus/:id` | Update return status |
 
-### Admin Panel
+### Admin Panel (port 3001)
 
 | Module | Endpoint | Description |
 |--------|----------|-------------|
-| Auth | `/api/auth/signIn` `/signUp` `/signOut` | Admin auth |
-| Products | `/api/products` | CRUD products, variants, images |
-| Catalog | `/api/catalog/categories` `/types` | Categories & types |
-| Sizes/Colors | `/api/catalog/sizes` `/colors` | Size and color management |
-| Promotions | `/api/promotions` | CRUD promotions |
-| Rentals | `/api/rentals` | Create/manage/update rental status |
-| Rental Items | `/api/rentals/:id/items` | Add/edit/remove rental items |
-| Payments | `/api/payments` | Record payment, approve/reject slip |
-| Deposits | `/api/rentals/:id/deposit` | Create/refund/deduct deposit |
-| Penalties | `/api/rentals/:id/penalties` | Add/edit/delete penalties |
-| Returns | `/api/rentals/:id/return` | Record return |
-| Invoices | `/api/rentals/:id/invoice` | Generate invoice |
-| Reservations | `/api/admin/reservations` | View & check stock availability |
-| Users | `/api/users` | Manage user accounts |
-| Reports | `/api/admin/revenue` `/products/top` `/rentals/overdue` | Revenue, top products, overdue |
-| Dashboard | `/api/admin/dashboard` | System stats overview |
-| Audit Logs | `/api/admin/audit` | View/delete audit logs |
+| Auth | `POST /user/signIn` | Admin sign in |
+| Auth | `GET /user/info` | Get admin info |
+| Products | `GET/POST /product/list` `/product/create` | List / create products |
+| Products | `PUT /product/update` | Update product |
+| Products | `DELETE /product/remove/:id` | Soft delete product |
+| Products | `POST /product/upload` | Upload product image |
+| Products | `POST /product/uploadFromExcel` | Import products from Excel |
+| Categories | `GET /api/categories` | List all categories |
+| Categories | `POST /api/categories` | Create category |
+| Categories | `PUT /api/categories/:id` | Update category |
+| Categories | `DELETE /api/categories/:id` | Soft delete category |
+| Categories | `POST /api/categories/uploadFromExcel` | Import categories from Excel |
+| RentalDays | `GET /api/rental-days` | List rental day options |
+| RentalDays | `POST /api/rental-days/save` | Create / update rental day |
+| Accounts | `GET /api/account/list` | List bank accounts |
+| Accounts | `POST /api/account/create` | Create account |
+| Accounts | `PUT /api/account/update` | Update account |
+| Accounts | `DELETE /api/account/remove/:id` | Soft delete account |
+| Customers | `GET /api/customers` | List customers |
+| Customers | `POST /api/customers` | Create customer |
+| Customers | `PUT /api/customers/:id` | Update customer |
+| Customers | `DELETE /api/customers/:id` | Soft delete customer |
+| Users | `GET /user/users` | List admin users |
+| Users | `POST /user/users` | Create admin user |
+| Users | `PUT /user/users/:id` | Update admin user |
+| Users | `DELETE /user/users/:id` | Soft delete admin user |
+
+---
+
+## 🗂️ Project Structure
+
+```
+CHICBORROW/
+├── api/                        # Backend (Express.js)
+│   ├── controllers/
+│   │   ├── AccountController.js
+│   │   ├── CategoryController.js
+│   │   ├── CustomerController.js
+│   │   ├── ProductController.js
+│   │   ├── RentalDaysController.js
+│   │   ├── SaleController.js
+│   │   └── UserController.js
+│   ├── prisma/
+│   │   └── schema.prisma
+│   ├── uploads/                # Product images
+│   ├── payments/               # Payment slip images
+│   ├── returns/                # Return photo images
+│   ├── shipping/               # Shipping images
+│   └── server.js
+│
+├── app/                        # Admin Panel (React)
+│   └── src/
+│       ├── components/
+│       └── pages/backoffice/
+│           ├── Account.js
+│           ├── BillSale.js
+│           ├── Category.js
+│           ├── Customer.js
+│           ├── Dashboard.js
+│           ├── Home.js
+│           ├── Product.js
+│           ├── RentalDays.js
+│           ├── signin.js
+│           └── user.js
+│
+└── homepage/                   # Customer App (React)
+    └── src/
+        ├── components/
+        └── pages/
+            ├── carts.js
+            ├── contact.js
+            ├── heart.js
+            ├── Home.js
+            ├── orders.js
+            ├── productdetail.js
+            ├── profile.js
+            ├── signin.js
+            └── signup.js
+```
 
 ---
 
@@ -158,45 +173,49 @@ HELD → REFUNDED  (item returned in good condition)
 git clone https://github.com/patsarun2545/<repo-name>.git
 cd <repo-name>
 
-# Install server dependencies
-cd server
+# Install backend dependencies
+cd api
 npm install
 
-# Install client dependencies
-cd ../client
+# Install admin panel dependencies
+cd ../app/app
+npm install
+
+# Install customer app dependencies
+cd ../../homepage/app
 npm install
 ```
 
 ### Environment Variables
 
-Create a `.env` file in the `server/` directory:
+Create a `.env` file in the `api/` directory:
 
 ```env
 DATABASE_URL="postgresql://user:password@localhost:5432/dress_rental"
-JWT_SECRET="your_jwt_secret"
-PORT=5000
+TOKEN_SECRET="your_jwt_secret"
 ```
 
 ### Database Setup
 
 ```bash
-cd server
+cd api
 npx prisma migrate dev
-npx prisma db seed   # optional: seed sample data
 ```
 
 ### Run Development
 
 ```bash
-# Start backend (from server/)
-npm run dev
+# Start backend (from api/)
+node server.js
 
-# Start frontend — customer app (from client/)
-npm run dev
+# Start admin panel (from app/app/)
+npm start
 
-# Start frontend — admin panel (from admin/)
-npm run dev
+# Start customer app (from homepage/app/)
+npm start
 ```
+
+Backend runs on **port 3001** by default.
 
 ---
 
