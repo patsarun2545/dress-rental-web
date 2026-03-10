@@ -1,4 +1,4 @@
-# 👗 CHICBORROW — Online Dress Rental System
+# 👗 Dress Rental Web
 
 A full-stack web application for managing dress rentals, built with the **PERN Stack** (PostgreSQL, Express.js, React.js, Node.js). The system is split into two parts — a **Customer App** for browsing and renting dresses, and an **Admin Panel** for managing rentals and products.
 
