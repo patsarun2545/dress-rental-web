@@ -18,13 +18,13 @@ function Sidebar() {
     } else {
       fetchData();
     }
-  }, []);
+  }, [navigate]);
 
   const fetchData = async () => {
     try {
       const res = await axios.get(
         config.apiPath + "/user/info",
-        config.headers()
+        config.headers(),
       );
 
       if (res.data.result !== undefined) {
@@ -88,14 +88,14 @@ function Sidebar() {
   return (
     <>
       <aside class="main-sidebar sidebar-dark-primary elevation-4">
-        <a href="" class="brand-link">
+        <Link to="" class="brand-link">
           <img
             src="dist/img/AdminLTELogo2.jpg"
             alt="AdminLTE Logo"
             class="brand-image img-circle elevation-3"
           />
           <span class="brand-text font-weight-light">ChicBorrow</span>
-        </a>
+        </Link>
 
         <div class="sidebar">
           <div class="user-panel d-flex align-items-center justify-content-between p-2">

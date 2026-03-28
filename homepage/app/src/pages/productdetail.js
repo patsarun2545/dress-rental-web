@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import Swal from "sweetalert2";
 import axios from "axios";
@@ -9,11 +9,7 @@ function ProductDetail() {
   const { id } = useParams(); // Get product ID from URL
   const [product, setProduct] = useState(null);
 
-  useEffect(() => {
-    fetchProduct();
-  }, [id]);
-
-  const fetchProduct = async () => {
+  const fetchProduct = useCallback(async () => {
     try {
       const res = await axios.get(`${config.apiPath}/product/detail/${id}`);
       setProduct(res.data);
@@ -24,12 +20,16 @@ function ProductDetail() {
         icon: "error",
       });
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchProduct();
+  }, [fetchProduct]);
 
   const addToCart = (item) => {
     const savedCart = JSON.parse(localStorage.getItem("carts")) || [];
     const isAlreadyInCart = savedCart.some(
-      (cartItem) => cartItem.id === item.id
+      (cartItem) => cartItem.id === item.id,
     );
 
     if (isAlreadyInCart) {
@@ -58,7 +58,7 @@ function ProductDetail() {
   const addToHeart = (item) => {
     const savedHeart = JSON.parse(localStorage.getItem("heart")) || [];
     const isAlreadyInHeart = savedHeart.some(
-      (heartItem) => heartItem.id === item.id
+      (heartItem) => heartItem.id === item.id,
     );
 
     if (isAlreadyInHeart) {

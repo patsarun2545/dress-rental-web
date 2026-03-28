@@ -9,45 +9,45 @@ import { useNavigate } from "react-router-dom";
 function Account() {
   const [account, setAccount] = useState({}); // CREATE, UPDATE
   const [accounts, setAccounts] = useState([]); // SHOW
-  const [currentUser, setCurrentUser] = useState(null); 
+  const [currentUser, setCurrentUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    checkPermissionAndFetchData();
-  }, []);
+    const checkPermissionAndFetchData = async () => {
+      try {
+        const userRes = await axios.get(
+          config.apiPath + "/user/info",
+          config.headers(),
+        );
 
-  const checkPermissionAndFetchData = async () => {
-    try {
-      const userRes = await axios.get(
-        config.apiPath + "/user/info",
-        config.headers()
-      );
+        if (userRes.data.result) {
+          setCurrentUser(userRes.data.result);
 
-      if (userRes.data.result) {
-        setCurrentUser(userRes.data.result);
+          if (userRes.data.result.status !== "owner") {
+            Swal.fire({
+              title: "ไม่มีสิทธิ์เข้าถึง",
+              text: "เฉพาะเจ้าของร้านเท่านั้นที่สามารถจัดการข้อมูลบัญชีร้านได้",
+              icon: "error",
+              timer: 5000,
+            });
+            navigate("/dashboard");
+            return;
+          }
 
-        if (userRes.data.result.status !== "owner") {
-          Swal.fire({
-            title: "ไม่มีสิทธิ์เข้าถึง",
-            text: "เฉพาะเจ้าของร้านเท่านั้นที่สามารถจัดการข้อมูลบัญชีร้านได้",
-            icon: "error",
-            timer: 5000,
-          });
-          navigate("/dashboard");
-          return;
+          fetchAccounts();
         }
-
-        fetchAccounts();
+      } catch (e) {
+        Swal.fire({
+          title: "Error",
+          text: "เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์",
+          icon: "error",
+        });
+        navigate("/dashboard");
       }
-    } catch (e) {
-      Swal.fire({
-        title: "Error",
-        text: "เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์",
-        icon: "error",
-      });
-      navigate("/dashboard");
-    }
-  };
+    };
+
+    checkPermissionAndFetchData();
+  }, [navigate]);
 
   const handleSave = async () => {
     try {
@@ -66,13 +66,13 @@ function Account() {
         res = await axios.post(
           config.apiPath + "/api/account/create",
           account,
-          config.headers()
+          config.headers(),
         );
       } else {
         res = await axios.put(
           config.apiPath + "/api/account/update",
           account,
-          config.headers()
+          config.headers(),
         );
       }
 
@@ -120,7 +120,7 @@ function Account() {
       if (button.isConfirmed) {
         const res = await axios.delete(
           config.apiPath + "/api/account/remove/" + item.id,
-          config.headers()
+          config.headers(),
         );
 
         if (res.data.message === "success") {
@@ -147,7 +147,7 @@ function Account() {
     try {
       const res = await axios.get(
         config.apiPath + "/api/account/list",
-        config.headers()
+        config.headers(),
       );
 
       if (res.data.results !== undefined) {
@@ -169,7 +169,6 @@ function Account() {
       bankName: "",
     });
   };
-
 
   const displayStatusText = (item) => {
     const baseClass =

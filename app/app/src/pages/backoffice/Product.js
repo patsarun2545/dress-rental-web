@@ -8,7 +8,7 @@ import config from "../../config";
 function Product() {
   const [product, setProduct] = useState({}); // CREATE, UPDATE
   const [products, setProducts] = useState([]); // SHOW
-  const [img, setImg] = useState({}); // File for Upload
+  const [, setImg] = useState({}); // File for Upload
   const [imgs, setImgs] = useState([]); // เก็บหลายไฟล์รูปภาพ
   const [fileExcel, setFileExcel] = useState({}); // File for Excel
   const refImg = useRef();
@@ -22,45 +22,14 @@ function Product() {
   useEffect(() => {
     fetchData();
     fetchCategories();
-    
+
     const urlParams = new URLSearchParams(window.location.search);
     const statusParam = urlParams.get("status");
-  
+
     if (statusParam) {
       setSelectedStatus(statusParam); // กรองตามสถานะ "use" หรือ "reserved"
     }
   }, []);
-  
-
-  const handleUpload = async () => {
-    try {
-      const formData = new FormData();
-      formData.append("img", img);
-
-      const res = await axios.post(
-        config.apiPath + "/product/upload",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: localStorage.getItem("token"),
-          },
-        }
-      );
-
-      if (res.data.newName !== undefined) {
-        return res.data.newName;
-      }
-    } catch (e) {
-      Swal.fire({
-        title: "error",
-        text: e.message,
-        icon: "error",
-      });
-
-      return "";
-    }
-  };
 
   const handleSave = async () => {
     try {
@@ -80,7 +49,7 @@ function Product() {
                 "Content-Type": "multipart/form-data",
                 Authorization: localStorage.getItem("token"),
               },
-            }
+            },
           );
 
           if (res.data.newName) {
@@ -104,13 +73,13 @@ function Product() {
         res = await axios.post(
           config.apiPath + "/product/create",
           { ...product, images: uploadedImages },
-          config.headers()
+          config.headers(),
         );
       } else {
         res = await axios.put(
           config.apiPath + "/product/update",
           { ...product, images: uploadedImages },
-          config.headers()
+          config.headers(),
         );
       }
 
@@ -140,7 +109,7 @@ function Product() {
     try {
       const res = await axios.get(
         config.apiPath + "/product/list",
-        config.headers()
+        config.headers(),
       );
 
       if (res.data.results !== undefined) {
@@ -149,7 +118,7 @@ function Product() {
             ...product,
             images: product.images || [], // เพิ่ม images ใน response
             status: product.status || "use", // เพิ่ม status ให้แสดงผล
-          }))
+          })),
         );
       }
     } catch (e) {
@@ -190,7 +159,7 @@ function Product() {
       if (button.isConfirmed) {
         const res = await axios.delete(
           config.apiPath + "/product/remove/" + item.id,
-          config.headers()
+          config.headers(),
         );
 
         if (res.data.message === "success") {
@@ -217,11 +186,11 @@ function Product() {
     try {
       const res = await axios.get(
         config.apiPath + "/api/categories",
-        config.headers()
+        config.headers(),
       );
       if (res.data) {
         const activeCategories = res.data.filter(
-          (category) => category.status === "active"
+          (category) => category.status === "active",
         ); // กรองเฉพาะที่ active
         setCategories(activeCategories);
       }
@@ -284,21 +253,13 @@ function Product() {
     return <></>;
   }
 
-  const selectedFile = (inputFile) => {
-    if (inputFile !== undefined) {
-      if (inputFile.length > 0) {
-        setImg(inputFile[0]);
-      }
-    }
-  };
-
   const selectedFiles = (inputFiles) => {
     if (inputFiles && inputFiles.length > 0) {
       setImgs(Array.from(inputFiles));
 
       // สร้าง preview URLs
       const previewUrls = Array.from(inputFiles).map((file) =>
-        URL.createObjectURL(file)
+        URL.createObjectURL(file),
       );
       setImgPreviews(previewUrls);
     }
@@ -325,7 +286,7 @@ function Product() {
             "Content-Type": "multipart/form-data",
             Authorization: localStorage.getItem("token"),
           },
-        }
+        },
       );
 
       if (res.data.message === "อัปโหลดและประมวลผลไฟล์สำเร็จ") {

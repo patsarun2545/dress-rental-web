@@ -1,5 +1,5 @@
 import BackOffice from "../components/BackOffice";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Swal from "sweetalert2";
 import axios from "axios";
 import config from "../config";
@@ -8,7 +8,7 @@ import { useLocation, Link } from "react-router-dom";
 
 function Home() {
   const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState([]);
+  const [, setCart] = useState([]);
   const [heart, setHeart] = useState([]);
   const location = useLocation();
   const [sortOption, setSortOption] = useState("latest"); // ตัวเลือกการเรียง
@@ -16,13 +16,7 @@ function Home() {
   const productsPerPage = 15; // จำนวนสินค้าต่อหน้า
   const [otherProducts, setOtherProducts] = useState([]);
 
-  useEffect(() => {
-    fetchData();
-    loadCartFromLocalStorage();
-    loadHeartFromLocalStorage();
-  }, [location, sortOption, currentPage]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     const queryParams = new URLSearchParams(location.search);
     const categoryId = queryParams.get("category");
     const searchTerm = queryParams.get("search");
@@ -36,12 +30,11 @@ function Home() {
         },
       });
 
-      // Filter the products to only include those with status "use"
       const filteredProducts = res.data.results.filter(
-        (product) => product.status === "use"
+        (product) => product.status === "use",
       );
       const nonUseProducts = res.data.results.filter(
-        (product) => product.status !== "use"
+        (product) => product.status !== "use",
       );
 
       setProducts(filteredProducts);
@@ -53,7 +46,13 @@ function Home() {
         icon: "error",
       });
     }
-  };
+  }, [location.search, sortOption]);
+
+  useEffect(() => {
+    fetchData();
+    loadCartFromLocalStorage();
+    loadHeartFromLocalStorage();
+  }, [fetchData, currentPage]);
 
   const loadCartFromLocalStorage = () => {
     const savedCart = JSON.parse(localStorage.getItem("carts")) || [];
@@ -68,7 +67,7 @@ function Home() {
   const addToCart = (item) => {
     const savedCart = JSON.parse(localStorage.getItem("carts")) || [];
     const isAlreadyInCart = savedCart.some(
-      (cartItem) => cartItem.id === item.id
+      (cartItem) => cartItem.id === item.id,
     );
 
     if (isAlreadyInCart) {
@@ -97,7 +96,7 @@ function Home() {
 
   const addToHeart = (item) => {
     const isAlreadyInHeart = heart.some(
-      (heartItem) => heartItem.id === item.id
+      (heartItem) => heartItem.id === item.id,
     );
     if (isAlreadyInHeart) {
       Swal.fire({
@@ -135,7 +134,7 @@ function Home() {
           className="card-img-top"
           height="200px"
           src={imgPath}
-          alt={item.name || "Product Image"}
+          alt="default"
         />
       );
     }
@@ -144,7 +143,7 @@ function Home() {
         className="card-img-top"
         height="200px"
         src="default_image.jpg"
-        alt="Default Image"
+        alt="default"
       />
     );
   };
@@ -183,7 +182,7 @@ function Home() {
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = products.slice(
     indexOfFirstProduct,
-    indexOfLastProduct
+    indexOfLastProduct,
   );
 
   const totalPages = Math.ceil(products.length / productsPerPage);

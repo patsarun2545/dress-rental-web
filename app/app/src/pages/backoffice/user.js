@@ -13,45 +13,41 @@ function User() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    checkPermissionAndFetchData();
-  }, []);
+    const checkPermissionAndFetchData = async () => {
+      try {
+        const userRes = await axios.get(
+          config.apiPath + "/user/info",
+          config.headers(),
+        );
 
-  // ตรวจสอบสิทธิ์และดึงข้อมูล
-  const checkPermissionAndFetchData = async () => {
-    try {
-      // ดึงข้อมูลผู้ใช้ที่ล็อกอินอยู่
-      const userRes = await axios.get(
-        config.apiPath + "/user/info",
-        config.headers()
-      );
+        if (userRes.data.result) {
+          setCurrentUser(userRes.data.result);
 
-      if (userRes.data.result) {
-        setCurrentUser(userRes.data.result);
+          if (userRes.data.result.status !== "owner") {
+            Swal.fire({
+              title: "ไม่มีสิทธิ์เข้าถึง",
+              text: "เฉพาะเจ้าของร้านเท่านั้นที่สามารถจัดการข้อมูลผู้ใช้ได้",
+              icon: "error",
+              timer: 5000,
+            });
+            navigate("/dashboard");
+            return;
+          }
 
-        // ตรวจสอบว่าเป็น owner หรือไม่
-        if (userRes.data.result.status !== "owner") {
-          Swal.fire({
-            title: "ไม่มีสิทธิ์เข้าถึง",
-            text: "เฉพาะเจ้าของร้านเท่านั้นที่สามารถจัดการข้อมูลผู้ใช้ได้",
-            icon: "error",
-            timer: 5000,
-          });
-          navigate("/dashboard");
-          return;
+          fetchUsers();
         }
-
-        // ถ้าเป็น owner ให้ดึงข้อมูลผู้ใช้ทั้งหมด
-        fetchUsers();
+      } catch (e) {
+        Swal.fire({
+          title: "Error",
+          text: "เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์",
+          icon: "error",
+        });
+        navigate("/dashboard");
       }
-    } catch (e) {
-      Swal.fire({
-        title: "Error",
-        text: "เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์",
-        icon: "error",
-      });
-      navigate("/dashboard");
-    }
-  };
+    };
+
+    checkPermissionAndFetchData();
+  }, [navigate]);
 
   const handleSave = async () => {
     try {
@@ -71,13 +67,13 @@ function User() {
         res = await axios.post(
           config.apiPath + "/user/users",
           user,
-          config.headers()
+          config.headers(),
         );
       } else {
         res = await axios.put(
           config.apiPath + `/user/users/${user.id}`,
           user,
-          config.headers()
+          config.headers(),
         );
       }
 
@@ -135,7 +131,7 @@ function User() {
       if (button.isConfirmed) {
         const res = await axios.delete(
           config.apiPath + `/user/users/${item.id}`,
-          config.headers()
+          config.headers(),
         );
 
         if (res.status === 200) {
@@ -162,7 +158,7 @@ function User() {
     try {
       const res = await axios.get(
         config.apiPath + "/user/users",
-        config.headers()
+        config.headers(),
       );
 
       if (res.data) {
