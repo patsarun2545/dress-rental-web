@@ -1,5 +1,9 @@
 # 👗 ChicBorrow — Dress Rental Web
 
+[![User Demo](https://img.shields.io/badge/User-Demo-000?style=flat-square&logo=vercel&logoColor=white)](https://dress-rental-web-wtnm.vercel.app/)
+[![Admin Demo](https://img.shields.io/badge/Admin-Demo-000?style=flat-square&logo=vercel&logoColor=white)](https://dress-rental-web.vercel.app/)
+
+
 A full-stack web application for managing dress rentals, built with the **PERN Stack** (PostgreSQL, Express.js, React.js, Node.js). The system is split into two parts — a **Customer App** (homepage) for browsing and renting dresses, and an **Admin Panel** (backoffice) for managing rentals and products.
 
 ---
