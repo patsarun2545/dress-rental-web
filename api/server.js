@@ -36,6 +36,8 @@ app.use("/api", customerController);
 app.use("/api", rentalDaysController);
 app.use("/api", accountController);
 
+app.get("/ping", (req, res) => res.status(200).json({ ok: true }));
+
 const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
