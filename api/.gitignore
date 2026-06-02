@@ -1,3 +1,54 @@
-node_modules
-# Keep environment variables out of version control
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Environment variables
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Upload directories (user-generated content)
+uploads/
+payments/
+returns/
+shipping/
+
+# Prisma
+prisma/migrations/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Misc
+*.log
